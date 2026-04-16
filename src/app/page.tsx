@@ -5,8 +5,9 @@ import { StatusCard } from "@/components/ui/status-card";
 
 const foundationItems = [
   "Next.js App Router with TypeScript enabled by default.",
-  "Tailwind CSS foundation with shared tokens for layout, typography, and UI states.",
-  "Feature-first folders ready for playlists, media assignment, and API integration.",
+  "Tailwind CSS foundation with shared tokens for layout, typography, forms, and UI states.",
+  "Axios API helpers and shared TypeScript models are in place for playlist and media data.",
+  "Validation tooling is installed and ready for reusable playlist forms.",
 ];
 
 export default function Home() {
