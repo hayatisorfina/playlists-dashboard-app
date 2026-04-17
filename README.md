@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Playlist Dashboard
 
-## Getting Started
+Welcome to the **Playlist Dashboard**! This is a lightweight, production-ready digital signage dashboard prototype built with Next.js, React, TypeScript, and Ant Design. This frontend application empowers system operators to securely manage playlists and author ad-hoc media items effectively.
 
-First, run the development server:
+## 🚀 Getting Started
+
+If you're new to the team, follow these steps to bootstrap your local prototyping environment quickly.
+
+### 1. Prerequisites
+
+Ensure your system has the following dependencies ready:
+* [Node.js](https://nodejs.org/) (v18.0.0 or newer is highly recommended)
+* [Yarn](https://yarnpkg.com/) globally installed
+* A reachable instance of the **NestJS Backend API** (local or remote) to serve mock metadata.
+
+### 2. Environment Configuration
+
+Clone the baseline environment configuration for your local workspace:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Windows (PowerShell)
+Copy-Item .env.example .env.local
+
+# macOS/Linux
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open your newly created `.env.local` and define `NEXT_PUBLIC_API_BASE_URL` to point towards the NestJS backend interface.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*⚠️ Important Note: Ensure that CORS configurations are correctly permitted over on the NestJS backend repository to facilitate interactions with the Next.js development origin.*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Installation & Run
 
-## Learn More
+Hydrate the local registry and spin up the frontend:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+yarn install
+yarn dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*Note: Your development machine may utilize `yarn dev --port=3004` to avoid port collision.*
+Open the active URL displayed in your console (usually [http://localhost:3000](http://localhost:3000)) to traverse the layout in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🏗️ Project Architecture & Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project implements robust, modern paradigms while striving to remain un-bloated.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Core Stack
+- **Framework**: Next.js App Router
+- **Type Safety**: strict TypeScript
+- **UI & Toolkit**: Ant Design v5 (Modals, Form Logic, Tables, Pages) & Tailwind CSS v4 (Spacings, Layout resets)
+- **Form Validation**: Ant Design built-in Form properties and schema enforcement via `zod`
+- **Data Fetching**: Pure REST `axios` queries paired with native Next server cache purges via `router.refresh()`.
+
+### Decisions and Tradeoffs
+
+- **Hybrid Data Fetching vs React Query**: A hybrid approach is used. Initial data is loaded on the server and passed to the client. The client then handles updates using `router.refresh()`. *Tradeoff*: This keeps the app size small because it does not use `@tanstack/react-query`. However, it means state updates must be handled manually instead of automatically.
+- **Ant Design Forms vs React Hook Form**: The project uses Ant Design's built-in `<Form>` component for building forms and checking rules. *Tradeoff*: This removes the need to install extra libraries like `react-hook-form` and works well with existing design tools. However, it connects the form logic very closely to the Ant Design library.
+- **Tailwind CSS + Ant Design**: Ant Design is used for complex parts like Tables and Modals. Tailwind CSS is used for spacing, layout, and basic styles. *Tradeoff*: This makes development much faster because there is no need to write custom CSS. But, extra care is needed to make sure Tailwind classes do not conflict with Ant Design styles.
+
+### Codebase Geography
+
+The layout breaks out logic logically between routing, monolithic features, and reusable components.
+
+```text
+src/
+├── app/                  # Next.js App Router definitions and top-level server components
+│   ├── page.tsx          # Site entrypoint (redirects instantly into playlists)
+│   └── playlists/        # /playlists index and /[id] dynamic routing logic
+├── features/             # Consolidated domain-specific views
+│   └── playlists/        # PlaylistListPage and PlaylistDetailPage grids and actions
+├── components/           # Generic interface atoms and reusable structures
+│   ├── layout/           # AppShell, navigational boundaries, common padding shells
+│   └── playlists/        # Specialized modal forms (PlaylistFormModal, MediaItemFormModal)
+├── lib/                  # Client configurations, env strict loaders, and API routing logic
+└── types/                # Strict DTO interfaces and TS definitions mapping backend tables
+```
+
+## 🛠️ Available Scripts
+
+Quickly reference workspace utility scripts:
+
+| Command        | Purpose                                            |
+|----------------|----------------------------------------------------|
+| `yarn dev`     | Spins the responsive next.js fast-refresh server   |
+| `yarn build`   | Bundles the app tightly for production deployment  |
+| `yarn start`   | Boots up the finalized production web container    |
+| `yarn lint`    | Static analysis and ESLint code-quality assurances |
+
+---
+
+**Where should I start?** Dive into `src/app/playlists/page.tsx` directly to trace how the server loads Playlists to push into the `src/features/playlists/PlaylistListPage.tsx` grid! Feel free to raise any questions you might have.
