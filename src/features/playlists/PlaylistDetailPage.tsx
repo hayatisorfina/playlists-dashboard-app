@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Button, Popconfirm, message, Space, Typography, Descriptions } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Table, Button, Popconfirm, message, Space, Typography, Card, Statistic, Row, Col, Tag } from "antd";
+import { PlusOutlined, DeleteOutlined, EditOutlined, ArrowLeftOutlined, ClockCircleOutlined, VideoCameraOutlined, CalendarOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import type { Playlist } from "@/types/playlist";
 import type { MediaItem as importedMediaItem } from "@/types/media";
-import { removeMediaFromPlaylist } from "@/lib/api/playlists";
+import { removeMediaFromPlaylist, getPlaylist } from "@/lib/api/playlists";
 import { PageShell } from "@/components/layout/page-shell";
 import { PlaylistFormModal } from "@/components/playlists/PlaylistFormModal";
+import { MediaItemFormModal } from "@/components/playlists/MediaItemFormModal";
 
 const { Text, Title, Link: AntLink } = Typography;
 
@@ -24,6 +26,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
   const [playlist, setPlaylist] = useState<Playlist>(initialData);
   const [loadingMediaId, setLoadingMediaId] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isMediaModalVisible, setIsMediaModalVisible] = useState(false);
 
   const handleRemoveMedia = async (mediaId: string) => {
     try {
@@ -98,48 +101,85 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
     },
   ];
 
+  const totalDuration = playlist.mediaItems.reduce((acc, curr) => acc + curr.durationSeconds, 0);
+  const mediaCount = playlist.mediaItems.length;
+
   return (
     <PageShell
       eyebrow="Playlist Details"
       title={playlist.name}
-      description="View and manage media assigned to this playlist."
+      description={playlist.description || "Manage the detailed view and content ordering for this playlist."}
       actions={
         <Space>
+          <Link href="/playlists">
+            <Button icon={<ArrowLeftOutlined />}>Back to Playlists</Button>
+          </Link>
           <Button icon={<EditOutlined />} onClick={() => setIsModalVisible(true)}>Edit Playlist</Button>
         </Space>
       }
     >
       <div className="flex flex-col gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <Descriptions title="Playlist Information" column={{ xxl: 3, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}>
-            <Descriptions.Item label="Name">{playlist.name}</Descriptions.Item>
-            <Descriptions.Item label="Created At">{new Date(playlist.createdAt).toLocaleDateString()}</Descriptions.Item>
-            <Descriptions.Item label="Description" span={3}>
-              {playlist.description || "No description provided."}
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={8}>
+            <Card className="h-full border-gray-200 shadow-sm group hover:border-blue-300 transition-colors" styles={{ body: { padding: '20px 24px' } }}>
+              <Statistic 
+                title={<Space className="text-gray-500 mb-1"><VideoCameraOutlined /> Total Media Items</Space>} 
+                value={mediaCount} 
+                valueStyle={{ fontWeight: 600 }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card className="h-full border-gray-200 shadow-sm group hover:border-blue-300 transition-colors" styles={{ body: { padding: '20px 24px' } }}>
+              <Statistic 
+                title={<Space className="text-gray-500 mb-1"><ClockCircleOutlined /> Total Duration</Space>} 
+                value={formatDuration(totalDuration)} 
+                valueStyle={{ fontWeight: 600 }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card className="h-full border-gray-200 shadow-sm group hover:border-blue-300 transition-colors" styles={{ body: { padding: '20px 24px' } }}>
+              <Statistic 
+                title={<Space className="text-gray-500 mb-1"><CalendarOutlined /> Created At</Space>} 
+                value={new Date(playlist.createdAt).toLocaleDateString()}
+                valueStyle={{ fontSize: '1.25rem', fontWeight: 500 }}
+              />
+            </Card>
+          </Col>
+        </Row>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <Title level={4} style={{ margin: 0 }}>Media Items</Title>
-            <Button type="primary" icon={<PlusOutlined />}>
+        <Card 
+          title={<span className="text-lg font-semibold text-gray-800"><FileTextOutlined className="mr-2 text-gray-500" /> Media Content</span>}
+          className="border-gray-200 shadow-sm overflow-hidden"
+          styles={{ header: { borderBottom: '1px solid #f0f0f0', backgroundColor: '#fafafa', padding: '16px 24px' }, body: { padding: 0 } }}
+          extra={
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsMediaModalVisible(true)}>
               Add Media
             </Button>
-          </div>
+          }
+        >
           <Table
             columns={columns}
             dataSource={playlist.mediaItems}
             rowKey="id"
             pagination={false}
           />
-        </div>
+        </Card>
       </div>
       <PlaylistFormModal
         open={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         playlist={playlist}
         onSuccess={(savedPlaylist) => setPlaylist(savedPlaylist)}
+      />
+      <MediaItemFormModal
+        open={isMediaModalVisible}
+        onClose={() => setIsMediaModalVisible(false)}
+        playlistId={playlist.id}
+        onSuccess={() => {
+          getPlaylist(playlist.id).then(setPlaylist);
+        }}
       />
     </PageShell>
   );

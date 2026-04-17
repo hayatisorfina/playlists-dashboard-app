@@ -41,6 +41,17 @@ export async function addMediaToPlaylist(
   return response.data;
 }
 
+export async function createMediaForPlaylist(
+  playlistId: string,
+  payload: { title: string; durationSeconds: number; url: string },
+): Promise<Playlist> {
+  const response = await apiClient.post<Playlist>(
+    `/playlist/${playlistId}/media`,
+    payload
+  );
+  return response.data;
+}
+
 export async function removeMediaFromPlaylist(
   playlistId: string,
   mediaId: string,
