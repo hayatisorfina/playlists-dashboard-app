@@ -47,3 +47,7 @@ export async function removeMediaFromPlaylist(
 ): Promise<void> {
   await apiClient.delete(`/playlist/${playlistId}/media/${mediaId}`);
 }
+
+export async function deletePlaylist(id: string): Promise<void> {
+  await apiClient.delete(`/playlist/${id}`);
+}

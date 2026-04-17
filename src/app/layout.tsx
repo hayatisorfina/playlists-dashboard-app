@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Operator dashboard for managing signage playlists and media.",
 };
 
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,7 +30,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full bg-[var(--color-page)] text-[var(--color-copy)] antialiased`}
     >
-      <body className="min-h-full font-sans">{children}</body>
+      <body className="min-h-full font-sans">
+        <AntdRegistry>{children}</AntdRegistry>
+      </body>
     </html>
   );
 }

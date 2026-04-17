@@ -6,7 +6,6 @@ export type Playlist = {
   description: string | null;
   mediaItems: MediaItem[];
   createdAt: string;
-  updatedAt: string;
 };
 
 export type PlaylistFormValues = {
