@@ -9,6 +9,7 @@ import type { Playlist } from "@/types/playlist";
 import type { MediaItem as importedMediaItem } from "@/types/media";
 import { removeMediaFromPlaylist } from "@/lib/api/playlists";
 import { PageShell } from "@/components/layout/page-shell";
+import { PlaylistFormModal } from "@/components/playlists/PlaylistFormModal";
 
 const { Text, Title, Link: AntLink } = Typography;
 
@@ -22,6 +23,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
   const router = useRouter();
   const [playlist, setPlaylist] = useState<Playlist>(initialData);
   const [loadingMediaId, setLoadingMediaId] = useState<string | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleRemoveMedia = async (mediaId: string) => {
     try {
@@ -103,7 +105,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
       description="View and manage media assigned to this playlist."
       actions={
         <Space>
-          <Button icon={<EditOutlined />}>Edit Playlist</Button>
+          <Button icon={<EditOutlined />} onClick={() => setIsModalVisible(true)}>Edit Playlist</Button>
         </Space>
       }
     >
@@ -133,6 +135,12 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
           />
         </div>
       </div>
+      <PlaylistFormModal
+        open={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        playlist={playlist}
+        onSuccess={(savedPlaylist) => setPlaylist(savedPlaylist)}
+      />
     </PageShell>
   );
 }

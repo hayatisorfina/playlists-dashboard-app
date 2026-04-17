@@ -7,8 +7,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { Playlist } from "@/types/playlist";
-import { deletePlaylist } from "@/lib/api/playlists"; // I will need to implement this
+import { deletePlaylist } from "@/lib/api/playlists";
 import { PageShell } from "@/components/layout/page-shell";
+import { PlaylistFormModal } from "@/components/playlists/PlaylistFormModal";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -18,6 +19,8 @@ export function PlaylistListPage({ initialData }: { initialData: Playlist[] }) {
   const [playlists, setPlaylists] = useState<Playlist[]>(initialData);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null);
 
   const filteredPlaylists = useMemo(() => {
     if (!searchText) return playlists;
@@ -73,7 +76,7 @@ export function PlaylistListPage({ initialData }: { initialData: Playlist[] }) {
           <Link href={`/playlists/${record.id}`}>
             <Button type="text" icon={<EyeOutlined />} size="small">View</Button>
           </Link>
-          <Button type="text" icon={<EditOutlined />} size="small">Edit</Button>
+          <Button type="text" icon={<EditOutlined />} size="small" onClick={() => { setEditingPlaylist(record); setIsModalVisible(true); }}>Edit</Button>
           <Popconfirm
             title="Delete the playlist"
             description="Are you sure to delete this playlist?"
@@ -94,7 +97,7 @@ export function PlaylistListPage({ initialData }: { initialData: Playlist[] }) {
       title="Playlists"
       description="Manage your digital signage playlists and their associated media items."
       actions={
-        <Button type="primary" icon={<PlusOutlined />}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => { setEditingPlaylist(null); setIsModalVisible(true); }}>
           Create Playlist
         </Button>
       }
@@ -120,6 +123,18 @@ export function PlaylistListPage({ initialData }: { initialData: Playlist[] }) {
           />
         </div>
       </div>
+      <PlaylistFormModal
+        open={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        playlist={editingPlaylist}
+        onSuccess={(savedPlaylist) => {
+          if (editingPlaylist) {
+             setPlaylists(prev => prev.map(p => p.id === savedPlaylist.id ? savedPlaylist : p));
+          } else {
+             setPlaylists(prev => [savedPlaylist, ...prev]);
+          }
+        }}
+      />
     </PageShell>
   );
 }
