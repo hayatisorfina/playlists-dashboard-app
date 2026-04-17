@@ -125,7 +125,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
               <Statistic 
                 title={<Space className="text-gray-500 mb-1"><VideoCameraOutlined /> Total Media Items</Space>} 
                 value={mediaCount} 
-                valueStyle={{ fontWeight: 600 }}
+                styles={{ content: { fontWeight: 600 } }}
               />
             </Card>
           </Col>
@@ -134,7 +134,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
               <Statistic 
                 title={<Space className="text-gray-500 mb-1"><ClockCircleOutlined /> Total Duration</Space>} 
                 value={formatDuration(totalDuration)} 
-                valueStyle={{ fontWeight: 600 }}
+                styles={{ content: { fontWeight: 600 } }}
               />
             </Card>
           </Col>
@@ -143,7 +143,7 @@ export function PlaylistDetailPage({ initialData }: { initialData: Playlist }) {
               <Statistic 
                 title={<Space className="text-gray-500 mb-1"><CalendarOutlined /> Created At</Space>} 
                 value={new Date(playlist.createdAt).toLocaleDateString()}
-                valueStyle={{ fontSize: '1.25rem', fontWeight: 500 }}
+                styles={{ content: { fontSize: '1.25rem', fontWeight: 500 } }}
               />
             </Card>
           </Col>
